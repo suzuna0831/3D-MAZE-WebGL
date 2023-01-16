@@ -33,20 +33,22 @@
             const controls = new THREE.OrbitControls(camera, document.body);
 
             // 1辺あたりに配置するオブジェクトの個数
-            const CELL_NUM = 25;
+            const CELL_NUM = 51;
+            const maze = generate(CELL_NUM, CELL_NUM, CELL_NUM);
             // 結合用のジオメトリを格納する配列
             const boxes = [];
             for (let i = 0; i < CELL_NUM; i++) {
                 for (let j = 0; j < CELL_NUM; j++) {
                     for (let k = 0; k < CELL_NUM; k++) {
+                        if(maze[i][j][k]) continue;
                         // 立方体個別の要素を作成
                         const geometryBox = new THREE.BoxGeometry(5, 5, 5);
 
                         // 座標調整
                         const geometryTranslated = geometryBox.translate(
-                            6 * (i - CELL_NUM / 2),
-                            6 * (j - CELL_NUM / 2),
-                            6 * (k - CELL_NUM / 2)
+                            5 * (i - CELL_NUM / 2),
+                            5 * (j - CELL_NUM / 2),
+                            5 * (k - CELL_NUM / 2)
                         );
 
                         // ジオメトリを保存
