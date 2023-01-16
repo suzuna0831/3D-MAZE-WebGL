@@ -1,12 +1,82 @@
-<!DOCTYPE html>
-<html lang="ja">
+<html>
 <head>
-  <meta charset="utf-8">
-  <title>サンプルHTML</title>
+    <meta charSet="utf-8"/>
+    <script src="https://unpkg.com/three@0.140.2/build/three.min.js"></script>
+    <script src="https://unpkg.com/three@0.137.4/examples/js/utils/BufferGeometryUtils.js"></script>
+    <script src="https://unpkg.com/stats.js@0.17.0/build/stats.min.js"></script>
+    <script src="https://unpkg.com/three@0.137.4/examples/js/controls/OrbitControls.js"></script>
+    <script src="js/MazeGenerator.js"></script>
+
+    <script>
+        // ページの読み込みを待つ
+        window.addEventListener('DOMContentLoaded', init);
+
+        function init() {
+            // サイズを指定
+            const width = 960;
+            const height = 540;
+
+            // レンダラーを作成
+            const renderer = new THREE.WebGLRenderer({
+                canvas: document.querySelector('#myCanvas'),
+            });
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(width, height);
+
+            // シーンを作成
+            const scene = new THREE.Scene();
+
+            // カメラを作成
+            const camera = new THREE.PerspectiveCamera(45, width / height);
+            camera.position.set(0, 0, 400);
+
+            const controls = new THREE.OrbitControls(camera, document.body);
+
+            // 1辺あたりに配置するオブジェクトの個数
+            const CELL_NUM = 25;
+            // 結合用のジオメトリを格納する配列
+            const boxes = [];
+            for (let i = 0; i < CELL_NUM; i++) {
+                for (let j = 0; j < CELL_NUM; j++) {
+                    for (let k = 0; k < CELL_NUM; k++) {
+                        // 立方体個別の要素を作成
+                        const geometryBox = new THREE.BoxGeometry(5, 5, 5);
+
+                        // 座標調整
+                        const geometryTranslated = geometryBox.translate(
+                            6 * (i - CELL_NUM / 2),
+                            6 * (j - CELL_NUM / 2),
+                            6 * (k - CELL_NUM / 2)
+                        );
+
+                        // ジオメトリを保存
+                        boxes.push(geometryTranslated);
+                    }
+                }
+            }
+            // ジオメトリを生成
+            const geometry = THREE.BufferGeometryUtils.mergeBufferGeometries(boxes);
+
+            // マテリアルを作成
+            const material = new THREE.MeshNormalMaterial();
+            // メッシュを作成
+            const mesh = new THREE.Mesh(geometry, material);
+            scene.add(mesh);
+
+
+            tick();
+
+            // 毎フレーム時に実行されるループイベントです
+            function tick() {
+                // レンダリング
+                renderer.render(scene, camera);
+                requestAnimationFrame(tick);
+            }
+        }
+    </script>
 </head>
 <body>
-
-<h1>Hello World</h1>
-<script src="MazeGenerator.js"></script>
+<canvas id="myCanvas"></canvas>
+<pre id="info"></pre>
 </body>
 </html>
