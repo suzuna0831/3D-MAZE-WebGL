@@ -1,7 +1,7 @@
 <html lang="en">
 <head>
     <meta charSet="utf-8"/>
-    <title>MAZE GENERATOR</title>
+    <title>MAZE GENERATOR - TIME</title>
     <link rel="stylesheet" href="css/main.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <script src="https://unpkg.com/three@0.140.2/build/three.min.js"></script>
@@ -20,16 +20,20 @@
         let renderer;
         let scene;
         let camera;
-        let controls;
+        let controls
+        let timer = null;
+        let count = 0;
         let size_x, size_y, size_z;
-        let paths = []; // 使わない
-        let maze;
-        let startTime; // 時間計測用
-        let endTime;
+        let boxes = [];
+        let paths = [];
 
         function init() {
             width = window.innerWidth;
             height = window.innerHeight;
+
+            timer = null;
+            boxes = [];
+            paths = [];
 
             // レンダラーを作成
             renderer = new THREE.WebGLRenderer({
@@ -48,50 +52,54 @@
 
             controls = new THREE.OrbitControls(camera, document.querySelector("#maze"));
 
-            size_x = size_y = size_z = 11;
-            create(size_x, size_y, size_z);
+            size_x = size_y = size_z = 13;
+            generate(size_x, size_y, size_z);
+            console.log(paths)
+            start();
             tick();
         }
+        function start(){
+            console.log("start");
+            if(!timer) timer = setInterval(execute, 10);
+        }
+        function stop(){
+            clearInterval(timer);
+            timer = null;
+            count = 0;
+        }
+        function execute(){
+            if(count + 1 === paths.length) {stop(); return;}
+            const mesh = create_mesh(++count%paths.length);
+            scene.clear();
+            scene.add(mesh);
+        }
         function onClick(){
+            console.log("Generate");
+            stop();
+            if(document.getElementById("x").value < 3 || document.getElementById("y").value < 3 || document.getElementById("z").value < 3) {
+                alert("each size must be at least 3");
+                return;
+            }
             size_x = document.getElementById("x").value;
             size_y = document.getElementById("y").value;
             size_z = document.getElementById("z").value;
             console.log("x : ",size_x, "\ny : ",size_y,"z : ",size_z);
-            if(size_x < 3 || size_y < 3 || size_z < 3) {
-                alert("each size must be at least 3");
-                return;
-            }
             if(size_x*size_y*size_z>=200000) alert("Due to its large size, the calculation may take some time.");
-            create(size_x, size_y,size_z);
+
+            boxes = [];
+            paths = [];
+            generate(size_x, size_y, size_z);
+            console.log(paths);
+            start();
         }
-        function create(size_x, size_y, size_z){
-            startTime = Date.now();
-            maze = generate(size_x, size_y, size_z);
-            endTime = Date.now();
-            console.log("Size : ",size_x*size_y*size_z);
-            console.log("Generating time : ", endTime - startTime);
-            console.log(maze);
-            startTime = Date.now();
-            scene.clear();
-            scene.add(create_mesh(size_x, size_y, size_z));
-            endTime = Date.now();
-            console.log("Rendering time : ", endTime - startTime);
-        }
-        function create_mesh(size_x, size_y, size_z){
-            const boxes = [];
-            for(let x=0; x<size_x; x++){
-                for(let y=0; y<size_y; y++){
-                    for(let z=0; z<size_z; z++){
-                        if(maze[x][y][z] === KIND.WALL) continue;
-                        const geometryBox = new THREE.BoxGeometry(5, 5, 5);
-                        boxes.push(geometryBox.translate(
-                            5 * (x - size_x / 2),
-                            5 * (y - size_y / 2),
-                            5 * (z - size_z / 2)
-                        ));
-                    }
-                }
-            }
+        function create_mesh(num){
+            const geometryBox = new THREE.BoxGeometry(5, 5, 5);
+            // 座標調整
+            boxes.push(geometryBox.translate(
+                5 * (paths[num].x - size_x / 2),
+                5 * (paths[num].y - size_y / 2),
+                5 * (paths[num].z - size_z / 2)
+            ));
             // ジオメトリを生成
             const geometry = THREE.BufferGeometryUtils.mergeBufferGeometries(boxes);
             // マテリアルを作成
@@ -99,9 +107,10 @@
             // メッシュを作成
             return new THREE.Mesh(geometry, material);
         }
+        let frame=0;
         function tick() {
             // レンダリング
-            renderer.render(scene, camera);
+            if(++frame%10)renderer.render(scene, camera);
             requestAnimationFrame(tick);
         }
         function onWindowResize(){

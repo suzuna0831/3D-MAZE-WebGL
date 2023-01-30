@@ -39,13 +39,15 @@ function moveTo(maze, now, dir){
     let moved;
     moved = [now.add(act[dir].div(2)), now.add(act[dir])];
     maze[moved[0].x][moved[0].y][moved[0].z] = maze[moved[1].x][moved[1].y][moved[1].z] = KIND.PATH;
+    paths.push(JSON.parse(JSON.stringify(moved[0])));
+    paths.push(JSON.parse(JSON.stringify(moved[1])));
     now = moved[1];
     return now;
 }
 
 function generate(size_x, size_y, size_z){
     if(size_x%2===0 || size_y%2===0|| size_z%2===0 || size_x<5 || size_y<5 || size_z < 5 ){
-        console.log("error");
+        console.error("error");
     }
 
     let maze = [];
@@ -60,13 +62,15 @@ function generate(size_x, size_y, size_z){
     startCord.add(new CORD(1,1,1));
     let dir;
     let now;
+    paths.push(new CORD(1,1,1));
     while (startCord.size !== 0) {
         now = [...startCord][Math.floor(Math.random() * (startCord.size))];
+        // if(maze[now.x][now.y][now.z] === KIND.WALL) paths.push(JSON.parse(JSON.stringify(now)));
+        maze[now.x][now.y][now.z] = KIND.PATH;
         if (cantMove(maze, now, size_x, size_y, size_z)) {
             startCord.delete(now);
             continue;
         }
-        maze[now.x][now.y][now.z] = KIND.PATH;
         while (1) {
             if (cantMove(maze, now, size_x, size_y, size_z)) break;
             if (!startCord.has(now)) startCord.add(now);
@@ -78,4 +82,4 @@ function generate(size_x, size_y, size_z){
     return maze;
 }
 
-console.log(generate(5,5,5));
+// console.log(generate(5,5,5));
