@@ -65,7 +65,7 @@ function generate(size_x, size_y, size_z){
     paths.push(new CORD(1,1,1));
     while (startCord.size !== 0) {
         now = [...startCord][Math.floor(Math.random() * (startCord.size))];
-        // if(maze[now.x][now.y][now.z] === KIND.WALL) paths.push(JSON.parse(JSON.stringify(now)));
+        if(maze[now.x][now.y][now.z] === KIND.WALL) paths.push(JSON.parse(JSON.stringify(now)));
         maze[now.x][now.y][now.z] = KIND.PATH;
         if (cantMove(maze, now, size_x, size_y, size_z)) {
             startCord.delete(now);
