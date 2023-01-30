@@ -2,7 +2,18 @@
 以前作った3D迷路生成器をWeb上で試せるようにしました。  
 WebGLのラッパであるThree.jsを使ってリアルタイムレンダリングによる3DCGを行ってます。
   
-https://naohcodes.github.io/3D-MAZE-WebGL/
+https://naohcodes.github.io/3D-MAZE-WebGL/  
+↓生成過程を見たい人  
+https://naohcodes.github.io/3D-MAZE-WebGL/time.html
+  
+   
+迷路生成器  
+https://github.com/naohCodeS/MazeGenerator
+
+# 注意
+- 壁のほうを描画しても訳が分からないので、通路のほうを描画しています。
+- 時間経過で壁を伸ばすほう（time.html）で大きいサイズの迷路を作ろうとすると処理落ちすることがあります（10000セルを超えないようにしたほうが良いです）
+- スマホ用のレイアウトは未作成なのでPC推奨です。（入力がかなりやりずらいはずです）
 
 # 実行時間
 
