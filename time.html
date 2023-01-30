@@ -75,17 +75,17 @@
         }
         function onClick(){
             console.log("Generate");
-            stop();
             if(document.getElementById("x").value < 3 || document.getElementById("y").value < 3 || document.getElementById("z").value < 3) {
                 alert("each size must be at least 3");
                 return;
             }
+            stop();
             size_x = document.getElementById("x").value;
             size_y = document.getElementById("y").value;
             size_z = document.getElementById("z").value;
             console.log("x : ",size_x, "\ny : ",size_y,"z : ",size_z);
-            if(size_x*size_y*size_z>=200000) alert("Due to its large size, the calculation may take some time.");
 
+            if(size_x*size_y*size_z>=10000) alert("Due to its large size, the calculation may take some time.");
             boxes = [];
             paths = [];
             generate(size_x, size_y, size_z);
